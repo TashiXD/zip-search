@@ -1,25 +1,35 @@
 import logo from "./logo.svg";
 import "./App.css";
 import Zip_search from "./components/zip_search";
+import React, { useState } from "react";
+import axios from "axios";
 
 function App() {
+  const [zipCodeChange, setZipCodeChange] = useState("");
+  const [cityState, setCityState] = useState([]);
+
+  const handleZipCodeChange = (event) => {
+    setZipCodeChange(event.target.value);
+  };
+
+  const getCity = async () => {
+    try {
+      const list = await axios.get(
+        `https://zip-api.eu/api/v1/info/US-${zipCodeChange}`
+      );
+
+      setCityState(list.data.place_name);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className="App">
-      <Zip_search zipCode="11373" />
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <input onChange={handleZipCodeChange} />
+      <button onClick={getCity}>Enter</button>
+
+      <Zip_search cityState={cityState} />
     </div>
   );
 }
